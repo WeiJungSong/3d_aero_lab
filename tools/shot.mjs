@@ -1,0 +1,21 @@
+import { chromium } from 'playwright';
+const file = process.argv[2] || 'dist/engine-lab-standalone.html';
+const out = process.argv[3] || 'shot.png';
+const w = +(process.argv[4] || 1440), h = +(process.argv[5] || 1000);
+const actions = process.argv[6] || '';
+const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
+const errs = [];
+page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.type() + ': ' + m.text()); });
+page.on('pageerror', e => errs.push('pageerror: ' + e.message + '\n' + e.stack));
+await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+await page.route(/cdn\.jsdelivr\.net\/npm\/three@0\.147\.0\/build\/three\.min\.js/, r => r.fulfill({ path: 'node_modules/three/build/three.min.js', contentType: 'application/javascript' }));
+await page.route(/cdn\.jsdelivr\.net\/npm\/three@0\.147\.0\/examples\/js\/controls\/OrbitControls\.js/, r => r.fulfill({ path: 'node_modules/three/examples/js/controls/OrbitControls.js', contentType: 'application/javascript' }));
+const t0 = Date.now();
+await page.goto('file://' + process.cwd() + '/' + file);
+await page.waitForTimeout(2500);
+if (actions) { await eval(`(async()=>{${actions}})()`); await page.waitForTimeout(1500); }
+await page.evaluate(() => { if (window.__EL) { window.__EL.S.anim = 0; } }); await page.waitForTimeout(800); await page.screenshot({ path: out, fullPage: true, timeout: 120000 });
+console.log('time', Date.now() - t0, 'ms');
+console.log(errs.slice(0, 20).join('\n') || 'no console errors');
+await browser.close();

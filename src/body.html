@@ -1,0 +1,69 @@
+<div class="app" id="app">
+  <header class="bar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#45cfe0" stroke-width="1.5"/><g stroke="#45cfe0" stroke-width="1.4" stroke-linecap="round"><path d="M12 12 L12 3.5"/><path d="M12 12 L19.4 16.2"/><path d="M12 12 L4.6 16.2"/></g><circle cx="12" cy="12" r="2.2" fill="#45cfe0"/></svg>
+      <h1>引擎剖面實驗室</h1><small>Engine Section Lab</small>
+    </div>
+    <nav class="seg" id="typeSeg" aria-label="引擎類型"></nav>
+    <div class="fieldbar"><span class="lbl">場變數</span><nav class="seg small" id="fieldSeg" aria-label="顯示場變數"></nav></div>
+  </header>
+
+  <div class="warnbar" id="warnbar" role="status"></div>
+
+  <div class="main">
+    <section class="vp" id="vp" aria-label="3D 引擎剖面視圖">
+      <div class="ovl labels3d" id="labels3d"></div>
+      <div class="ovl probe" id="probe"></div>
+      <div class="ovl legend" id="legend"><div class="t"><span id="lgName"></span><span id="lgUnit"></span></div><canvas id="lgCanvas"></canvas></div>
+      <div class="ovl tools" id="tools">
+        <button data-view="iso">等角</button><button data-view="side">正視剖面</button><button data-view="front">前視</button><button data-view="rear">後視</button><button data-view="top">俯視</button>
+      </div>
+      <div class="ovl chips" id="chips"></div>
+      <div class="ovl busy" id="busy"></div>
+    </section>
+    <aside class="rack" id="rack" aria-label="參數控制"></aside>
+  </div>
+
+  <section class="eicas" aria-label="引擎指示">
+    <div class="dials" id="dials"></div>
+    <div class="nums" id="nums"></div>
+  </section>
+
+  <section class="analysis">
+    <article class="card">
+      <header><h2>軸向分布<small id="axSub"></small></h2><div class="keys" id="axKeys"></div></header>
+      <div class="chart" id="axChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">流道截面平均值。點擊圖面可移動橫截面位置。</div>
+    </article>
+    <article class="card">
+      <header><h2>T–s 圖<small>溫度－熵</small></h2><div class="keys" id="tsKeys"></div></header>
+      <div class="chart" id="tsChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">熵以進口靜狀態為零點，沿核心流道逐點積分 ds = c<sub>p</sub>dT/T − R dP/P。</div>
+    </article>
+    <article class="card">
+      <header><h2>橫截面<small id="secSub"></small></h2></header>
+      <div class="sec-ctl"><label for="secX">軸向位置</label><input type="range" id="secX" min="0" max="1000" step="1"><output id="secXo"></output></div>
+      <div class="sec-wrap chart" id="secChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">由進氣端往後看；虛線為兩個剖切面方位。</div>
+    </article>
+  </section>
+
+  <section class="card">
+    <header><h2>站位參數<small>SAE AS755 站號</small></h2><span class="sub">T、P 為靜參數；Tt、Pt 為總參數</span></header>
+    <div class="tbl-wrap"><table class="st" id="stTable"></table></div>
+  </section>
+
+  <details class="notes" id="notes">
+    <summary>模型說明與假設</summary>
+    <ul>
+      <li>循環：逐站參數循環分析。壓氣機、風扇、渦輪以多變效率計算；冷段 γ=1.40、c<sub>p</sub>=1004.5 J/(kg·K)，熱段 γ=1.33、c<sub>p</sub>=1156.9 J/(kg·K)，後燃段 γ=1.30、c<sub>p</sub>=1243 J/(kg·K)。未計入渦輪冷卻引氣與功率提取。</li>
+      <li>設計點：海平面標準大氣、靜止、100% 油門；「設計參數」群組中的數值在此狀態成立。</li>
+      <li>非設計點：假設高、低壓渦輪導向葉片喉部壅塞（τ<sub>t</sub>、π<sub>t</sub> 固定），以功率平衡與流量連續求解風扇與壓氣機工作點；高涵道渦扇的核心與外涵噴嘴為固定面積收斂噴嘴，未壅塞時低壓渦輪膨脹比隨之調整。低涵道混合排氣型假設風扇沿「修正流量 ∝ 修正轉速」的操作線運轉，並以混合器兩股總壓相等決定風扇工作點與低壓渦輪膨脹比。軍用型噴嘴喉部面積可變，出口面積上限為喉部的 1.8–1.9 倍，超過即為欠膨脹。</li>
+      <li>油門以 Tt4 / Tt4,max 表示；任一軸機械轉速超過設計值 105% 時，自動降低 Tt4 以限轉。</li>
+      <li>大氣：ISA 標準大氣（0–20 km）。超音速進氣總壓恢復採 MIL-E-5007D 公式。</li>
+      <li>流場：由各流道節點（總溫、總壓、以設計點有效面積換算的馬赫數）內插重建截面平均值，再疊加壁面邊界層（1/7 次方律）、葉片排旋流、燃燒室主燃區與摻混區溫度分布、燃油噴嘴熱斑與其在渦輪中的衰減、混合器瓣片、後燃器火焰穩定器火焰面。此為示意性重建，非數值求解納維－斯托克斯方程。</li>
+      <li>噴流：以動量通量 U² 與焓通量 U·ΔT<sub>t</sub> 守恆的高斯擴散模型計算外流與噴流混合；欠膨脹噴流以 Pack 公式 L = 1.306·√(M<sub>j</sub>²−1)·D 估計震波胞間距。</li>
+      <li>幾何：三型引擎的流道為代表性示意，依設計空氣流量以 √(ṁ/ṁ<sub>ref</sub>) 等比縮放，不對應特定型號。</li>
+    </ul>
+  </details>
+</div>

@@ -1,0 +1,20 @@
+{
+  "name": "engine-lab",
+  "version": "2.0.0",
+  "private": true,
+  "description": "3D 噴射引擎剖面實驗室（一維循環 + 場重建）與軸對稱 CFD 版本（WebGL2 GPU 求解器），單一 HTML。",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:v1": "node build.mjs v1",
+    "build:cfd": "node build.mjs cfd",
+    "test:phys": "node tools/test_phys.js",
+    "test:fuzz": "node tools/fuzz.js",
+    "test:walls": "node tools/wallchk.js"
+  },
+  "dependencies": {
+    "three": "0.147.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.40.0"
+  }
+}

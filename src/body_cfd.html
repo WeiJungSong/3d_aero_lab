@@ -1,0 +1,71 @@
+<div class="app" id="app">
+  <header class="bar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="#45cfe0" stroke-width="1.4"/><g stroke="#45cfe0" stroke-width="1" opacity="0.7"><path d="M2 8h20M2 14h20M8 2v20M14 2v20"/></g><path d="M3 17 C8 17 9 9 21 8" fill="none" stroke="#f3b43f" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <h1>引擎 CFD 實驗室</h1><small>Axisymmetric CFD</small>
+    </div>
+    <nav class="seg" id="typeSeg" aria-label="引擎類型"></nav>
+    <div class="fieldbar"><span class="lbl">場變數</span><nav class="seg small" id="fieldSeg" aria-label="顯示場變數"></nav></div>
+  </header>
+
+  <div class="warnbar" id="warnbar" role="status"></div>
+
+  <div class="main">
+    <section class="vp" id="vp" aria-label="3D 引擎 CFD 剖面視圖">
+      <div class="ovl labels3d" id="labels3d"></div>
+      <div class="ovl probe" id="probe"></div>
+      <div class="ovl legend" id="legend"><div class="t"><span id="lgName"></span><span id="lgUnit"></span></div><canvas id="lgCanvas"></canvas></div>
+      <div class="ovl tools" id="tools">
+        <button data-view="iso">等角</button><button data-view="side">正視剖面</button><button data-view="front">前視</button><button data-view="rear">後視</button><button data-view="top">俯視</button>
+      </div>
+      <div class="ovl solverbar" id="solverbar"></div>
+      <div class="ovl chips" id="chips"></div>
+    </section>
+    <aside class="rack" id="rack" aria-label="參數控制"></aside>
+  </div>
+
+  <section class="eicas" aria-label="引擎指示">
+    <div class="dials" id="dials"></div>
+    <div class="nums" id="nums"></div>
+  </section>
+
+  <section class="analysis">
+    <article class="card">
+      <header><h2>軸向分布<small id="axSub"></small></h2><div class="keys" id="axKeys"></div></header>
+      <div class="chart" id="axChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">實線：CFD 截面質量加權平均；虛線：一維循環分析。點擊圖面可移動徑向剖面位置。</div>
+    </article>
+    <article class="card">
+      <header><h2>收斂歷程<small>殘差與推力</small></h2><div class="keys" id="cvKeys"></div></header>
+      <div class="chart" id="cvChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="chart" id="cfChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">殘差為兩次讀回間密度相對變化之均方根（每次迭代）。</div>
+    </article>
+    <article class="card">
+      <header><h2>徑向分布<small id="rpSub"></small></h2></header>
+      <div class="sec-ctl"><label for="rpX">軸向位置</label><input type="range" id="rpX" min="0" max="1000" step="1"><output id="rpXo"></output></div>
+      <div class="chart" id="rpChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">灰色帶為固體（輪轂、機匣、短艙）。</div>
+    </article>
+  </section>
+
+  <section class="card">
+    <header><h2>站位參數<small>CFD 對照一維循環</small></h2><span class="sub">CFD 為截面質量加權平均</span></header>
+    <div class="tbl-wrap"><table class="st" id="stTable"></table></div>
+  </section>
+
+  <details class="notes" id="notes">
+    <summary>CFD 方法與假設</summary>
+    <ul>
+      <li>方程：軸對稱可壓縮 Navier–Stokes（無旋流），守恆變數 ρ、ρu、ρv、E 與燃燒產物質量分率 ρY；比熱比隨 Y 由 1.40（空氣）線性變化至 1.33（燃氣）。</li>
+      <li>數值方法：有限體積法，HLLC 近似黎曼解，MUSCL 二階重建（minmod 限制器），SSP-RK2 時間積分，局部時間步加速收斂至穩態。於 GPU（WebGL2 浮點紋理）逐格計算。</li>
+      <li>網格：直角 (x, r) 拉伸網格，引擎內部加密；壁面以切割格處理（體積分率與面開口分率），不使用階梯近似；比格子還薄的壁面，格只保留較大一側並關閉另一側的面，避免兩流道經同一格互通。粗網格先行收斂後內插至目標網格（網格序列）。</li>
+      <li>邊界：上游、上方與下游為 Riemann 不變量遠場邊界；軸線為對稱；壁面為滑移壁（無摩擦）。高涵道渦扇的核心與外涵噴嘴出口面積取自一維循環設計點。</li>
+      <li>葉片排：以體積力模型表示，溫比 τ 取自一維循環。每格總溫比為 τ<sup>權重·Δx</sup>，以西面（上游）總焓為基準、以格兩側軸向面質量通量計功，穩態時整排總溫比等於 τ；軸向力依多變效率決定損失。渦輪在通過流量低於設計值 30% 時線性減功。靜子不做功，未模擬葉片阻塞。</li>
+      <li>轉軸：轉速固定於一維循環的工作點，不做轉軸功率迭代匹配——在本體積力模型中，渦輪功增加會同時增加流阻、降低流量，以渦輪溫比或轉速做匹配為正回饋而發散。「轉軸功率比」= 渦輪功率 × 機械效率 ÷ 壓縮功率，由求解器實際施加的功源積分而得，作為一致性診斷（1.00 表示平衡）。</li>
+      <li>燃燒室與後燃器：熱源使流體沿流向鬆弛至目標總溫分布，加入對應燃料質量並使 Y 趨近 1；零流量時不加熱。出口質量平均總溫以控制迴路調整熱源強度，維持在油門指定的 Tt4（與後燃 Tt7），相當於燃油控制。襯套與火焰穩定器僅作外觀顯示。</li>
+      <li>紊流：可選 Prandtl 混合長度模型（薄剪切層近似，只計 ∂u/∂r 剪應力、熱與組分擴散），噴流下游混合長度 l = 0.075·δ，δ 自出口起線性成長。</li>
+      <li>推力：引擎作用於流體的軸向力總和（葉片體積力 + 壁面表壓力），已含衝壓阻力與短艙外部壓力阻力，不含摩擦。</li>
+    </ul>
+  </details>
+</div>
