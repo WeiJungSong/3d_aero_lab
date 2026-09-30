@@ -222,3 +222,26 @@ table.st tr:hover td { background: var(--panel-2); }
   .brand small { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .solverbar .st.run i { animation: none; } }
+
+/* ---------- v3 全機氣動實驗室（新增） ---------- */
+.analysis.air { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr); }
+.analysis.air2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+.analysis.air2 table.st { min-width: 480px; }
+.cfd-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 12px; align-items: start; }
+.cfd-grid table.st { min-width: 560px; }
+.cfd-grid table.st td:last-child { white-space: normal; min-width: 200px; max-width: 320px; color: var(--ink-3); font-size: var(--t-xs); text-align: left; }
+.cfd-grid table.st th:last-child { text-align: left; }
+.lbl3d.mk { border-left-color: var(--amber); color: var(--amber); }
+.nm .k sub, .nm .x sub, .chip sub, .warnbar sub, .probe sub, .tip sub, .keys sub { font-size: 0.78em; }
+@media (max-width: 1180px) {
+  .analysis.air { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .analysis.air .card:first-child { grid-column: 1 / -1; }
+  .analysis.air2 { grid-template-columns: minmax(0, 1fr); }
+  .analysis.air2 .card:first-child { grid-column: auto; }
+  .cfd-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .analysis.air, .analysis.air2 { grid-template-columns: minmax(0, 1fr); }
+  .analysis.air .card:first-child { grid-column: auto; }
+}
+.eicas .nums .nm .x { white-space: normal; line-height: 1.3; }

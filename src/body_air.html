@@ -1,0 +1,88 @@
+<div class="app" id="app">
+  <header class="bar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 13.2 L10 12 L13.5 4.5 L15.4 4.8 L13.8 12 L19.5 11.6 L21.3 9.3 L22.2 9.5 L21.2 13 L22.2 16.5 L21.3 16.7 L19.5 14.4 L13.8 14 L15.4 21.2 L13.5 21.5 L10 14 L2.5 12.8 Z" fill="none" stroke="#45cfe0" stroke-width="1.2" stroke-linejoin="round"/><path d="M1 8.5 C6 7.5 9 9 12 8.2" fill="none" stroke="#f3b43f" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <h1>全機氣動實驗室</h1><small>Aircraft Aero Lab</small>
+    </div>
+    <nav class="seg" id="typeSeg" aria-label="機型"></nav>
+    <div class="fieldbar"><span class="lbl">場變數</span><nav class="seg small" id="fieldSeg" aria-label="顯示場變數"></nav></div>
+    <div class="fieldbar"><span class="lbl">計算方法</span><nav class="seg small" id="modeSeg" aria-label="計算方法"></nav></div>
+  </header>
+
+  <div class="warnbar" id="warnbar" role="status"></div>
+
+  <div class="main">
+    <section class="vp" id="vp" aria-label="3D 全機氣動視圖">
+      <div class="ovl labels3d" id="labels3d"></div>
+      <div class="ovl probe" id="probe"></div>
+      <div class="ovl legend" id="legend"><div class="t"><span id="lgName"></span><span id="lgUnit"></span></div><canvas id="lgCanvas"></canvas></div>
+      <div class="ovl tools" id="tools">
+        <button data-view="iso">等角</button><button data-view="side">側視</button><button data-view="front">前視</button><button data-view="top">俯視</button><button data-view="under">仰視</button>
+      </div>
+      <div class="ovl solverbar" id="solverbar"></div>
+      <div class="ovl chips" id="chips"></div>
+    </section>
+    <aside class="rack" id="rack" aria-label="參數控制"></aside>
+  </div>
+
+  <section class="eicas" aria-label="飛行與引擎指示">
+    <div class="dials" id="dials"></div>
+    <div class="nums" id="nums"></div>
+  </section>
+
+  <section class="analysis air">
+    <article class="card">
+      <header><h2>阻力分解<small id="dgSub"></small></h2><div class="keys" id="dgKeys"></div></header>
+      <div class="chart" id="dgChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">單位：阻力計數（1 count = 0.0001 C<sub>D</sub>，以翼參考面積為基準）。摩擦與形狀阻力依 Raymer 組件累加法；誘導阻力的展向效率取自面元法 Trefftz 平面分析。</div>
+    </article>
+    <article class="card">
+      <header><h2>翼面壓力分布<small id="cpSub"></small></h2><div class="keys" id="cpKeys"></div></header>
+      <div class="sec-ctl"><label for="cpEta">展向位置</label><input type="range" id="cpEta" min="0" max="1000" step="1"><output id="cpEtao"></output></div>
+      <div class="chart" id="cpChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="chart" id="slChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">上圖：弦向 C<sub>p</sub>（縱軸向上為負，吸力朝上）；下圖：展向負載 c·c<sub>l</sub>/c̄，虛線為同升力之橢圓分布。</div>
+    </article>
+    <article class="card">
+      <header><h2>推力與阻力<small id="tdSub"></small></h2><div class="keys" id="tdKeys"></div></header>
+      <div class="chart" id="tdChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">目前高度與重量下的平飛阻力（配平）與最大可用推力；交點為最大平飛速度，淺色帶為失速區。</div>
+    </article>
+  </section>
+
+  <section class="analysis air2">
+    <article class="card">
+      <header><h2>飛行包線<small id="envSub"></small></h2><div class="keys" id="envKeys"></div></header>
+      <div class="chart" id="envChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="sub">色階為最大推力下的比剩餘功率 P<sub>s</sub>（m/s）；粗線 P<sub>s</sub> = 0 為平飛包線，虛線為失速邊界（C<sub>L</sub> = C<sub>L,max</sub>）。</div>
+    </article>
+    <article class="card">
+      <header><h2>任務剖面<small id="msSub"></small></h2><div class="keys" id="msKeys"></div></header>
+      <div class="chart" id="msChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="tbl-wrap"><table class="st" id="msTable"></table></div>
+    </article>
+  </section>
+
+  <section class="card" id="cfdCard" hidden>
+    <header><h2>3D CFD 對照<small>Euler 方程、對稱半域</small></h2><span class="sub" id="cfdSub"></span></header>
+    <div class="keys" id="cvKeys"><span><i style="border-color:#a8b4c0"></i>密度殘差（左軸，對數）</span><span><i style="border-color:#45cfe0"></i>C<sub>L</sub>（右軸）</span><span><i class="d" style="border-color:#f3b43f"></i>C<sub>D,p</sub> × 10（右軸）</span><span><i class="d" style="border-color:rgba(69,207,224,0.6)"></i>配平所需 C<sub>L</sub></span></div>
+    <div class="cfd-grid">
+      <div class="chart" id="cvChart"><canvas></canvas><div class="tip" hidden></div></div>
+      <div class="tbl-wrap"><table class="st" id="cfdTable"></table></div>
+    </div>
+  </section>
+
+  <details class="notes" id="notes">
+    <summary>方法與假設</summary>
+    <ul>
+      <li>機型：三款通用外形（雙發窄體客機、單發超音速攔截機、單發多用途戰機），非特定真實機型；尺寸、質量與重心可調。引擎取自一維循環模型：客機裝兩具高涵道渦扇（翼下短艙），攔截機裝一具渦輪噴射、戰機裝一具低涵道後燃渦扇（機身內置）。</li>
+      <li>面元法：3D 低階面元法（Morino 公式，常強度源與偶極四邊形面元、對稱半模）。機身與翼、尾翼根部以共用節點接合（水密），尾跡由後緣沿固定方向延伸，根部尾跡沿機身表面內收至對稱面。升力面的升力與力矩以條帶環量（Kutta–Joukowski）計算，機身與短艙以表面壓力積分；展向效率由 Trefftz 平面正弦級數擬合。</li>
+      <li>可壓縮性：M ≤ 0.85 以 Göthert 法則（x 方向伸長 1/β，C<sub>p</sub> = C<sub>p</sub>′/β²）；M ≥ 1.15 表面 C<sub>p</sub> 以局部傾角法（翼面切楔斜震波、機體切錐、背風面 Prandtl–Meyer 膨脹），兩者之間以線性內插示意。周圍流場切片取自面元法（M &gt; 0.85 時為 M = 0.85 的近似）；引擎內部流場與排氣噴流取自一維循環的場重建模型並疊加。</li>
+      <li>配平：全動平尾偏轉（以面元法向速度修正表示）與攻角同時求解，使升力等於負載因數 × 重量、對重心力矩為零。</li>
+      <li>阻力：摩擦（層流／紊流混合平板、表面粗糙度截止雷諾數）× 形狀因子 × 干擾因子 × 濕面積（由面元網格積分）；機尾上翹、起落架、襟翼、漏氣與突出物；波阻：跨音速 Korn 方程 + Lock 四次方律，超音速 Sears–Haack 體（截面積分布由幾何積分）× E<sub>WD</sub>；升力相關阻力：K = 1/(πAe) + 0.38 C<sub>D0</sub>，超音速採線性理論。</li>
+      <li>推力：一維循環逐工作點計算（轉速上限 105%），扣除裝機損失；平飛時自動求油門使推力等於阻力。</li>
+      <li>任務剖面：起飛滾行積分 → 依校正空速／馬赫數排程爬升（能量法）→ 定高定速巡航（戰機含後燃超音速衝刺）→ 慢車下降 → 降落滾行；逐步扣除燃油重量。</li>
+      <li>3D CFD：對稱半域直角伸展網格（機體附近等間距）上解 3D 可壓縮 Euler 方程（有限體積、HLLC 通量、MUSCL 重建、Heun 二階時間積分、局部時間步），GPU（WebGL2）逐格計算，不支援時改用 CPU 極粗網格。機體以切割格表示（流體體積分率與面開口率，壁面壓力以源項加入），翼與平尾中弧面另以隔板面處理薄翼；短艙以子午線外包絡為實體，進氣面與噴嘴出口為固定狀態格（取自一維循環工作點）。表面壓力積分得升力、力矩與壓力阻力（含波阻與誘導阻力，不含摩擦）；網格較粗時數值耗散會造成額外壓力阻力。</li>
+    </ul>
+  </details>
+</div>
